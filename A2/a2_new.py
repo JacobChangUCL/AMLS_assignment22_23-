@@ -52,9 +52,9 @@ test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
 
 # 定义模型
-class GenderClassificationModel(nn.Module):
+class EmotionDetectionModel(nn.Module):
     def __init__(self):
-        super(GenderClassificationModel, self).__init__()
+        super(EmotionDetectionModel, self).__init__()
         self.features = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
         self.features.fc = nn.Linear(self.features.fc.in_features, 2)
 
@@ -63,7 +63,7 @@ class GenderClassificationModel(nn.Module):
         return x
 
 
-model = GenderClassificationModel()
+model = EmotionDetectionModel()
 
 # 使用GPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -120,12 +120,12 @@ def evaluate_model(model, test_loader):
 evaluate_model(model, test_loader)
 
 # 保存模型
-torch.save(model.state_dict(), 'gender_detection_model.pth')
+torch.save(model.state_dict(), 'emotion_detection_model.pth')
 
 if __name__ == "__main__":
     # 加载模型
-    model = GenderClassificationModel()
-    model.load_state_dict(torch.load('gender_detection_model.pth'))
+    model = EmotionDetectionModel()
+    model.load_state_dict(torch.load('emotion_detection_model.pth'))
     model = model.to(device)
 
     # 进行预测
