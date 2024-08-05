@@ -1,10 +1,10 @@
-# Applied Machine Learning Systems ELEC0134 (22/23) -  Assignment
+# Applied Machine Learning Systems-Assignment
 
 ## The organization of this project is as follows:
 
-- AMLS_22-23_SN12345678
+- AMLS_22-23_
   - A1
-    - gender_detetion.py
+    - gender_detection.py
     - gender_detection_model_0.pth
     - ...
     - gender_detection_model_9.pth
@@ -47,8 +47,10 @@ conda activate cv
 # Step 3: Install the libraries specified in requirements.txt:
 pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
 ```
+- **Note**: Please run **train_all.py** before running main.py to train the model and save the model parameters.
+- You can quickly reduce the model's training time by modifying the 'num_rounds' and 'layers' parameters in the utils.py file, allowing for rapid validation of the project.
 
-- The utils.py file provides common definitions for the " .py" files under the ‘A1’, ‘A2’, ‘B1’, and ‘B2’ folders, such as loading data, image preprocessing, defining, training, and evaluating models.
+- The utils.py file provides common utility functions used by the" .py" files under the ‘A1’, ‘A2’, ‘B1’, and ‘B2’ folders, such as loading data, image preprocessing, defining, training, and evaluating models.
 - The " .py" files under the ‘A1’, ‘A2’, ‘B1’, and ‘B2’ folders are mainly used for training models and saving model parameters. Each model is trained 10 times, and the trained parameters are saved to the respective ".pth" files under each folder.
 - The main.py file directly loads the pre-trained models and outputs the corresponding prediction results for each task.
 - The Datasets folder is used to store training and testing images.

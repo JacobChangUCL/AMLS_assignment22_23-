@@ -12,39 +12,43 @@ from torchvision import transforms, models
 specify_dataset_for_task = {
     "A1": {
         "task": "gender_detection",
-        "train_image_folder": "../Datasets/celeba/img",
-        "train_labels_file": "../Datasets/celeba/labels.csv",
-        "test_image_folder": "../Datasets/celeba_test/img",
-        "test_labels_file": "../Datasets/celeba_test/labels.csv",
+        "train_image_folder": "./Datasets/celeba/img",
+        "train_labels_file": "./Datasets/celeba/labels.csv",
+        "test_image_folder": "./Datasets/celeba_test/img",
+        "test_labels_file": "./Datasets/celeba_test/labels.csv",
         "num_classes": 2,
     },
     "A2": {
         "task": "emotion_detection",
-        "train_image_folder": "../Datasets/celeba/img",
-        "train_labels_file": "../Datasets/celeba/labels.csv",
-        "test_image_folder": "../Datasets/celeba_test/img",
-        "test_labels_file": "../Datasets/celeba_test/labels.csv",
+        "train_image_folder": "./Datasets/celeba/img",
+        "train_labels_file": "./Datasets/celeba/labels.csv",
+        "test_image_folder": "./Datasets/celeba_test/img",
+        "test_labels_file": "./Datasets/celeba_test/labels.csv",
         "num_classes": 2,
     },
     "B1": {
         "task": "face_shape_recognition",
-        "train_image_folder": "../Datasets/cartoon_set/img",
-        "train_labels_file": "../Datasets/cartoon_set/labels.csv",
-        "test_image_folder": "../Datasets/cartoon_set_test/img",
-        "test_labels_file": "../Datasets/cartoon_set_test/labels.csv",
+        "train_image_folder": "./Datasets/cartoon_set/img",
+        "train_labels_file": "./Datasets/cartoon_set/labels.csv",
+        "test_image_folder": "./Datasets/cartoon_set_test/img",
+        "test_labels_file": "./Datasets/cartoon_set_test/labels.csv",
         "num_classes": 5,
     },
     "B2": {
         "task": "eye_color_recognition",
-        "train_image_folder": "../Datasets/cartoon_set/img",
-        "train_labels_file": "../Datasets/cartoon_set/labels.csv",
-        "test_image_folder": "../Datasets/cartoon_set_test/img",
-        "test_labels_file": "../Datasets/cartoon_set_test/labels.csv",
+        "train_image_folder": "./Datasets/cartoon_set/img",
+        "train_labels_file": "./Datasets/cartoon_set/labels.csv",
+        "test_image_folder": "./Datasets/cartoon_set_test/img",
+        "test_labels_file": "./Datasets/cartoon_set_test/labels.csv",
         "num_classes": 5,
     },
     "batch_size": 32,
     "device": torch.device("cuda" if torch.cuda.is_available() else "cpu"),
     "criterion": nn.CrossEntropyLoss(),
+    "layers" : [50,101,152],  #18,34,50,101,152
+    "lr" : 0.001,
+    "num_epochs" : 10,
+    "num_rounds" : 10
 }
 
 
@@ -118,9 +122,24 @@ transform = transforms.Compose(
 
 # Define the model
 class AMLS_Model(nn.Module):
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, layer_number):
         super(AMLS_Model, self).__init__()
-        self.features = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
+        if layer_number == 18:
+            self.features = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
+        elif layer_number == 34:
+            self.features = models.resnet34(weights=models.ResNet34_Weights.DEFAULT)
+        elif layer_number == 50:
+            self.features = models.resnet50(weights = models.ResNet50_Weights.DEFAULT)
+        elif layer_number == 101:
+            self.features = models.resnet101(weights = models.ResNet101_Weights.DEFAULT)
+        elif layer_number == 152:
+            self.features = models.resnet152(weights = models.ResNet152_Weights.DEFAULT)
+        else:
+            raise ValueError("The number of layers in ResNet is wrong.")
+
+        # Freeze the parameters of the features layer.
+        # for param in self.features.parameters():
+        #     param.requires_grad = False
         self.features.fc = nn.Linear(self.features.fc.in_features, num_classes)
 
     def forward(self, x):
@@ -128,12 +147,12 @@ class AMLS_Model(nn.Module):
         return x
 
 
-def get_optimizer(model, lr=0.001):
+def get_optimizer(model, lr = specify_dataset_for_task["lr"]):
     return optim.Adam(model.parameters(), lr=lr)
 
 
 # Function to train the model
-def train_model(model, train_loader, criterion, optimizer, num_epochs=10):
+def train_model(model, train_loader, criterion, optimizer, num_epochs = specify_dataset_for_task["num_epochs"]):
     for epoch in range(num_epochs):
         model.train()
         running_loss = 0.0
